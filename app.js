@@ -4,9 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
 var app = express();
 
 // view engine setup
@@ -19,6 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images/anuncios/', express.static(path.join(__dirname, 'public/images')));
 
 /**
  * Conexión con la base de datos
@@ -26,8 +24,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 require('./lib/connectMongoose');
 require('./models/Anuncio');
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+/**
+ * Rutas API
+ */
+app.use('/apiv1/anuncios', require('./routes/apiv1/anuncios'));
+
+app.locals.title = 'NodePOP';
+
+/**
+ * Rutas app Web
+ */
+app.use('/', require('./routes/index'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -37,12 +44,26 @@ app.use(function(req, res, next) {
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    if (err.array) {
+        err.status = 422;
+        const errInfo = err.array({ onlyFirstError: true })[0];
+        err.message = isAPI(req) ?
+        { message: 'Not valid', errors: err.mapped() }:
+        `Not valid - ${errInfo.param} ${errInfo.msg}`;
+    }
 
-  // render the error page
   res.status(err.status || 500);
+
+  if(isAPI(req)) {
+      res.json({ success: false, error: err.message });
+      return;
+  }
+  // render the error page
   res.render('error');
 });
+
+function isAPI(req) {
+    return req.originalUrl.indexOf('/apiv') === 0;
+}
 
 module.exports = app;
