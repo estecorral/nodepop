@@ -7,45 +7,48 @@ const Anuncio = require('../../models/Anuncio');
 
 /**
  *  GET /anuncios
- *  Devuelve la lista de anuncios
+ *  Devuelve la lista de anuncios, pudiendo limitar con ?limit=num
  */
 router.get('/', async (req, res, next) => {
     try {
-        const anuncios = await Anuncio.find().exec();
+        const nombre = req.query.nombre;
+        const tags = req.query.tag;
+        const precio = req.query.precio;
+        const venta = req.query.venta;
+        const limit = parseInt(req.query.limit);
+        const start = parseInt(req.query.start);
+        const sort = req.query.sort;
+
+        const filter = {};
+
+      if(nombre) {
+            filter.nombre = new RegExp('^' + nombre, "i");
+        }
+         if (tags) {
+            filter.tags = {'$all': [tags]};
+        }
+        if (typeof precio !== 'undefined') {
+              if (precio[0] === '-') {
+                  filter.precio = {'$lte': Math.abs(parseInt(precio))};
+              } else if (precio[precio.length - 1] === '-'){
+                  filter.precio = {'$gte': parseInt(precio)};
+              } else if (precio.indexOf('-') > 0 && precio.indexOf('-') < precio.length - 1){
+                  let precio1 = precio.substring(0, precio.indexOf('-'));
+                  let precio2 = precio.substring(precio.indexOf('-') + 1 , precio.length);
+                  filter.precio = {'$gte': parseInt(precio1), '$lte': parseInt(precio2)};
+              } else {
+                filter.precio = precio;
+            }
+        }
+        if(venta) {
+            filter.venta = venta;
+        }
+        const anuncios = await Anuncio.list({filter: filter, limit, start, sort});
         res.json({ success: true, result: anuncios });
     }catch (e) {
         next(e);
     }
 });
-
-/**
- *  GET /anuncios:precio
- *  Obtiene anuncios por rango de precios
- */
-router.get('/:precio', async (req, res, next) => {
-    try {
-        const _precio = req.params.precio;
-
-        const anuncio = await Anuncio.find().exec();
-
-        if (!anuncio) {
-            res.status(404).json({ success: false });
-            return;
-        }
-
-        res.json({ success: true, result: anuncio});
-    } catch (e) {
-        next(e);
-    }
-
-});
-
-
-/**
- *  GET /anuncios:tags
- *  Obtiene todos los tags de los anuncios
- */
-
 
 /**
  *  POST /anuncios
