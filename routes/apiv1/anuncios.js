@@ -51,6 +51,19 @@ router.get('/', async (req, res, next) => {
 });
 
 /**
+ * GET /tags
+ * Muestra listado de los diferentes tags
+ */
+
+router.get('/tags', async (req, res, next) => {
+   try {
+       const tags = await Anuncio.distinct('tags').exec();
+       res.json({ success: true, result: tags });
+   } catch (e) {
+       next(e);
+   }
+});
+/**
  *  POST /anuncios
  *  Añade un anuncio nuevo
  */
