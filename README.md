@@ -41,3 +41,5 @@ http://localhost:3000
   * Ejemplo:
   http://localhost:3000?tag=mobile&venta=false&nombre=ip&precio=50-&start=0&limit=2&sort=precio
 
+### Iniciar eslint
+*npm run lint
