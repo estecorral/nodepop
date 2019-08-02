@@ -28,5 +28,16 @@ http://localhost:3000/apiv1/anuncios
   * precio: si ponemos un precio nos mostrara los que coincidan con el, si indicamos -50 nos lista los de
   menor a 50, si indicamos 50- mostrara los mayores a ese precio y si indicamos 50-100 mostrara los que 
   se encuentren estre ese rango de valores.
-  
-  
+
+  * Ejemplo:
+  http://localhost:3000/apiv1/anuncios?tag=mobile&venta=false&nombre=ip&precio=50-&start=0&limit=2&sort=precio
+### Lista de los tags
+http://localhost:3000/apiv1/anuncios/tags  
+
+### Vista del listado de todos los anuncios utiliza los mismos parámetros que en el caso anterior
+http://localhost:3000
+
+
+  * Ejemplo:
+  http://localhost:3000?tag=mobile&venta=false&nombre=ip&precio=50-&start=0&limit=2&sort=precio
+
