@@ -1,5 +1,9 @@
 # README API PRACTICA NODE
 
+## URL en la que esta desplegada la práctica:
+```
+ec2-18-219-27-78.us-east-2.compute.amazonaws.com
+```
 ## Iniciar aplicación modo develop:
 * npm run dev
 
